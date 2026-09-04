@@ -3,7 +3,9 @@
 #include <zephyr/device.h>
 #include <zephyr/drivers/gpio.h>
 
-// Led pin configurations
+
+// tavoite 2 pistettä, koska tehtynä perusosa + pause toiminto
+
 static const struct gpio_dt_spec red = GPIO_DT_SPEC_GET(DT_ALIAS(led0), gpios);
 static const struct gpio_dt_spec green = GPIO_DT_SPEC_GET(DT_ALIAS(led1), gpios);
 //static const struct gpio_dt_spec blue = GPIO_DT_SPEC_GET(DT_ALIAS(led2), gpios);
@@ -21,13 +23,12 @@ K_THREAD_DEFINE(yellow_thread,STACKSIZE,yellow_led_task,NULL,NULL,NULL,PRIORITY,
 
 
 volatile int led_state = 0; // red = 1, yellow = 2, green = 3, pause = 4
-volatile int yellow_direction = 0; //
+volatile int yellow_direction = 0; // 0 = next -> red, 1 = next -> green
 volatile int saved_state = 0;
 volatile int paused = 0;
 
 // Configure buttons
 #define BUTTON_0 DT_ALIAS(sw0)
-// #define BUTTON_1 DT_ALIAS(sw1)
 static const struct gpio_dt_spec button_0 = GPIO_DT_SPEC_GET_OR(BUTTON_0, gpios, {0});
 static struct gpio_callback button_0_data;
 int init_button();
