@@ -5,7 +5,7 @@
 #include <zephyr/drivers/uart.h>
 #include <zephyr/timing/timing.h>
 
-
+// yhden pisteen suoritus
 
 #define STACKSIZE 500
 #define PRIORITY 5
