@@ -7,15 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// yhden pisteen suoritus
-
-/*
-TODO näille refaktoroituun sopivat toiminnallisuudet
-volatile int led_state = 0; // red = 1, yellow = 2, green = 3, pause = 4
-volatile int yellow_direction = 0; // 0 = next -> red, 1 = next -> green
-volatile int saved_state = 0;
-volatile int paused = 0;
-*/
+// kahden pisteen suoritus
 
 #define STACKSIZE 500
 #define PRIORITY 5
@@ -25,6 +17,8 @@ volatile int paused = 0;
 #define TIME_LEN_ERROR      -1
 #define TIME_ARRAY_ERROR    -2
 #define TIME_VALUE_ERROR    -3
+#define TIME_DIGIT_ERROR    -4
+#define TIMER_RESULT_ERROR  -5
 
 int init_led();
 int init_button();
@@ -338,31 +332,38 @@ int time_parse(char *time) {
 		return seconds;
 	}
 
+	if (strlen(time) != 6){
+			seconds = TIME_LEN_ERROR;
+			return seconds;
+		} 
+
+	for (int i = 0; i < 6; i++){
+		if (!isdigit((unsigned char)(time[i]))){
+			seconds = TIME_DIGIT_ERROR;
+			return seconds;
+		}
+	}	
+
     int values[3];
 	values[2] = atoi(time+4); // seconds
 	time[4] = 0;
 	values[1] = atoi(time+2); // minutes
 	time[2] = 0;
 	values[0] = atoi(time); // hours
-	// Now you have:
-	// values[0] hour
-	// values[1] minute
-	// values[2] second
-	// TODO: Add boundary check time values: below zero or above limit not allowed
 
-	if(values[0] > 23){
+	if(values[0] < 0 || values[0] > 23 ||
+	   values[1] < 0 || values[1] > 59 ||					
+	   values[2] < 0 || values[2] > 59){
 		seconds = TIME_VALUE_ERROR;
 		return seconds;
 	}
-	else if(values[1] > 59){
-		seconds = TIME_VALUE_ERROR;
-		return seconds;
-	}
-	 else if (values[2] > 59){
-		seconds = TIME_VALUE_ERROR;
-		return seconds;
-	 }
 
 	seconds = (values[0] * 60 * 60) + (values[1] * 60) + values[2];
+
+	if (seconds <= 0){
+		seconds =  TIMER_RESULT_ERROR;
+		return seconds;
+	}
+
 	return seconds;
 }
